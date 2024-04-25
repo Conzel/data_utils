@@ -1,0 +1,17 @@
+[project]
+name = "data_utils"
+version = "0.1"
+authors = [
+  { name = "Alexander Conzelmann", email = "a.conzelmann@student.uni-tuebingen.de" },
+]
+description = ""
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = []
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+ignore = ["E501"]
