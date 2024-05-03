@@ -110,7 +110,7 @@ def show_hist(
     if isinstance(x, torch.Tensor):
         x = x.detach().numpy()
     assert isinstance(x, np.ndarray)
-    plt.hist(x.flatten(), bins=bins, range=range, *args, **kwargs) # type:ignore
+    plt.hist(x.flatten(), bins=bins, range=range, *args, **kwargs)  # type:ignore
     if title is not None:
         plt.title(title)
     plt.show()

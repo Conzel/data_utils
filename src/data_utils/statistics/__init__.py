@@ -10,6 +10,7 @@ from ._distortions import (
     max_error,
     nll,
     entropy,
+    entropy_counts,
 )
 from ._time_series import (
     spearman_rho,
@@ -35,4 +36,5 @@ __all__ = [
     "angular_distance",
     "detrend",
     "autocorr",
+    "entropy_counts",
 ]

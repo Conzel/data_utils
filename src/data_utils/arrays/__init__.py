@@ -8,7 +8,7 @@ from ._arrays import (
     get_bytes_of_tensor,
     subsample,
     flatten_coords,
-    take_batches
+    take_batches,
 )
 
 __all__ = [

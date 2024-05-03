@@ -3,9 +3,10 @@ import torch
 import math
 import numpy as np
 from data_utils.arrays import make_numpy, NumpyConvertible
+from typing import Optional
 
 
-def entropy(x: NumpyConvertible, grid_width: float = None) -> float:
+def entropy(x: NumpyConvertible, grid_width: Optional[float] = None) -> float:
     """Returns entropy of an array using the histogram as an estimate of the probability distribution.
 
     If x is a float array, the data is rounded to the nearest grid point in a grid where each point has distance grid_width to its neighbors. I.e.
@@ -13,16 +14,23 @@ def entropy(x: NumpyConvertible, grid_width: float = None) -> float:
 
         max_error = grid_width / 2
         grid_width = 2 * max_error
-    
+
     If grid_width is None, the data is not quantised.
     """
     x = make_numpy(x)
     if grid_width is not None:  # type: ignore
         x = np.round(x / grid_width) * grid_width
     x = x.flatten()
+    c = np.unique(x, return_counts=True)[1]
 
-    _, c = np.unique(x, return_counts=True)
-    c_prob = c / c.sum()
+    return entropy_counts(c)
+
+
+def entropy_counts(counts: np.ndarray | torch.Tensor) -> float:
+    """Returns the entropy of a distribution given the counts of each value."""
+    counts = make_numpy(counts)
+    c_prob = counts / counts.sum()
+    c_prob = c_prob[c_prob > 0]
     return np.sum(-np.log2(c_prob) * c_prob)
 
 

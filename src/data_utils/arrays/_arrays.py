@@ -6,6 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 
 NumpyConvertible = Union[torch.Tensor, np.ndarray]
 
+
 def take_batches(ds: Dataset | DataLoader, n: int):
     """Takes n batches from a dataset or dataloader."""
     batches = None
@@ -13,17 +14,16 @@ def take_batches(ds: Dataset | DataLoader, n: int):
         if j >= n:
             break
         if batches is None:
-            batches = [[] for _ in range(len(data))] 
+            batches = [[] for _ in range(len(data))]
         for i, d in enumerate(data):
             if not isinstance(d, torch.Tensor):
                 d = torch.tensor(d)
             batches[i].append(d)
     if batches is None:
         raise ValueError("Empty dataset passed.")
-    
+
     batches_stacked = [torch.stack(batch) for batch in batches]
     return tuple(batches_stacked)
-
 
 
 def flatten_coords(coords: torch.Tensor) -> torch.Tensor:
