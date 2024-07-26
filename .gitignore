@@ -1,3 +1,4 @@
+copy-remote.sh
 .ipynb_checkpoints
 artifacts
 wandb

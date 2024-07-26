@@ -36,5 +36,5 @@ __all__ = [
     "angular_distance",
     "detrend",
     "autocorr",
-    "entropy_counts",
+    "entropy_counts"
 ]
