@@ -32,6 +32,9 @@ class AdaptiveSampler:
         self.i = 0
         self.max_iter = max_iter
 
+    def manually_add(self, a: float):
+        self.a_stack.append(a)
+
     def get_next(self):
         self.i += 1
         if self.i > self.max_iter:
