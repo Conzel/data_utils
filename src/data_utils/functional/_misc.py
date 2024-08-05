@@ -1,5 +1,5 @@
 from typing import Iterator, TypeVar, Optional
-from dataclasses import asdict
+from dataclasses import asdict, fields
 
 
 def flatten_dict(config: dict) -> list[dict]:
@@ -62,3 +62,9 @@ def dataclass_list_bind(dataclasses: list) -> dotdict:
 
             super_d.setdefault(method, []).append(getattr(d, method))
     return dotdict(super_d)
+
+
+def dataclass_from_dict(classname, d):
+    field_set = {f.name for f in fields(classname) if f.init}
+    filtered_args = {k: v for k, v in d.items() if k in field_set}
+    return classname(**filtered_args)

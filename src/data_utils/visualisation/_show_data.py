@@ -90,10 +90,11 @@ def _show_grid(
 
 
 def show_hist(
-    x: NumpyConvertible,
+    xs: list[NumpyConvertible],
     title: Optional[str] = None,
     bins: Optional[int] = None,
     range: Optional[tuple[float, float]] = None,
+    labels: Optional[list[str]] = None,
     *args,
     **kwargs,
 ):
@@ -107,10 +108,20 @@ def show_hist(
         *args: Additional arguments passed to plt.hist().
         **kwargs: Additional arguments passed to plt.hist().
     """
-    if isinstance(x, torch.Tensor):
-        x = x.detach().numpy()
-    assert isinstance(x, np.ndarray)
-    plt.hist(x.flatten(), bins=bins, range=range, *args, **kwargs)  # type:ignore
+    plt.figure()
+    for x in xs:
+        if isinstance(x, torch.Tensor):
+            x = x.detach().numpy()
+        assert isinstance(x, np.ndarray)
+        if labels is not None:
+            label = labels.pop(0)
+            plt.hist(x.flatten(), bins=bins, range=range, label=label, *args, **kwargs)
+        else:
+            plt.hist(
+                x.flatten(), bins=bins, range=range, *args, **kwargs
+            )  # type:ignore
     if title is not None:
         plt.title(title)
+    if labels is not None:
+        plt.legend()
     plt.show()
