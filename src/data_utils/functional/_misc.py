@@ -1,4 +1,4 @@
-from typing import Iterator, TypeVar, Optional
+from typing import Iterable, Iterator, TypeVar, Optional
 from dataclasses import asdict, fields
 
 
@@ -44,7 +44,7 @@ class dotdict(dict):
 T = TypeVar("T")
 
 
-def take(it: Iterator[T], n: int) -> Iterator[T]:
+def take(it: Iterable[T], n: int) -> Iterable[T]:
     for i, x in enumerate(it):
         if i < n:
             yield x
