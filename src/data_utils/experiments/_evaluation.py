@@ -1,4 +1,4 @@
-from typing import Iterable, Literal
+from typing import Iterable, Literal, Optional
 import pandas as pd
 import numpy as np
 
@@ -9,19 +9,26 @@ def pareto_front(
     y_column: str,
     mode: Literal["over", "under"],
     nsteps: int = 100,
-    logspace: bool = False,
+    grid: Literal["linear", "log", "continuous"] = "continuous",
+    logspace: Optional[bool] = None,
 ) -> pd.DataFrame:
+    if logspace is not None:
+        grid = "log" if logspace else "linear"
     pareto_rows = []
-    val_range = df[y_column].max() - df[y_column].min()
-    if logspace:
+    if grid == "log":
         threshhold_values = np.logspace(
             np.log10(df[y_column].min()), np.log10(df[y_column].max()), nsteps
         )
-    else:
+    elif grid == "linear":
         threshhold_values = np.linspace(df[y_column].min(), df[y_column].max(), nsteps)
+    else:
+        threshhold_values = np.sort(df[y_column].unique())
+        threshhold_values = (
+            np.flip(threshhold_values) if mode == "under" else threshhold_values
+        )
 
     for t in threshhold_values:
-        mask = df[y_column] < t if mode == "under" else df[y_column] > t
+        mask = df[y_column] <= t if mode == "under" else df[y_column] >= t
         acceptable = df[mask]
         if len(acceptable) == 0:
             continue
