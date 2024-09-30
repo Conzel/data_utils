@@ -1,9 +1,10 @@
+from data_utils.arrays._quant import quant_to_grid
 import torch
 from typing import Optional
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from data_utils.arrays import NumpyConvertible
+from data_utils.arrays import NumpyConvertible, make_numpy
 
 
 def show_tensor(
@@ -125,3 +126,69 @@ def show_hist(
     if labels is not None:
         plt.legend()
     plt.show()
+
+
+def show_quantized_bar(
+    wq: NumpyConvertible,
+    show=False,
+    title: Optional[str] = "Quantized bar plot on regular grid",
+    ax=None,
+    nlabels=5,
+    dx=None,
+    zero_array_width: float = 1,
+):
+    grid_points, counts, dx = quant_to_grid(wq, dx=dx)
+
+    if ax is None:
+        _, ax = plt.subplots()
+
+    if dx == 0:
+        ax.bar(0, np.sum(counts), width=zero_array_width, align="center")
+        ax.set_xticks([0])
+    else:
+        ax.bar(
+            grid_points, counts, width=dx * 0.9, align="center"
+        )  # bar width based on dx
+        step = max(1, len(grid_points) // nlabels)  # Show approximately 10 labels
+        ax.set_xticks(grid_points[::step])
+
+    ax.set_xlabel("Grid Points (Midpoints)")
+    ax.set_ylabel("Count")
+    if title is not None:
+        ax.set_title(title)
+    if show:
+        plt.show()
+
+
+def cross_out(ax=None, pad=0.05):
+    if ax is None:
+        ax = plt.gca()
+    # Get the limits of the plot and apply a bit of padding for the 'X'
+    x_limits = ax.get_xlim()
+    y_limits = ax.get_ylim()
+
+    # Padding (amount beyond the axis limits)
+    x_pad = (x_limits[1] - x_limits[0]) * 0.05  # 10% padding
+    y_pad = (y_limits[1] - y_limits[0]) * 0.05  # 10% padding
+
+    # Ensure the axis limits are drawn first
+    ax.figure.canvas.draw()  # type: ignore
+
+    # Draw two diagonal lines (crossing out the plot) with extended limits and disable clipping
+    ax.plot(
+        [x_limits[0] - x_pad, x_limits[1] + x_pad],
+        [y_limits[0] - y_pad, y_limits[1] + y_pad],
+        color="red",
+        linestyle="--",
+        linewidth=3,
+        clip_on=False,
+    )  # Diagonal from bottom-left to top-right
+
+    ax.plot(
+        [x_limits[0] - x_pad, x_limits[1] + x_pad],
+        [y_limits[1] + y_pad, y_limits[0] - y_pad],
+        color="red",
+        linestyle="--",
+        linewidth=3,
+        clip_on=False,
+    )  # Diagonal from top-left to bottom-right

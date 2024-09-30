@@ -10,6 +10,7 @@ from ._arrays import (
     flatten_coords,
     take_batches,
 )
+from ._quant import quant_to_grid, to_idx_space
 
 __all__ = [
     "take_batches",
@@ -22,4 +23,6 @@ __all__ = [
     "get_bytes_of_tensor",
     "get_bytes_of_net",
     "subsample",
+    "quant_to_grid",
+    "to_idx_space",
 ]

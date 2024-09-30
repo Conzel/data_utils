@@ -20,10 +20,8 @@ from ._time_series import (
     detrend,
     autocorr,
 )
-from ._timer import Timer
 
 __all__ = [
-    "Timer",
     "psnr",
     "mse",
     "rmse",
