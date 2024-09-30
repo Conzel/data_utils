@@ -2,7 +2,7 @@
 name = "data_utils"
 version = "0.1"
 authors = [
-  { name = "Alexander Conzelmann", email = "a.conzelmann@student.uni-tuebingen.de" },
+  { name = "Anonymous", email = "anonymous@todo.com" },
 ]
 description = ""
 readme = "README.md"
