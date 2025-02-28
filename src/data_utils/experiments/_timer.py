@@ -1,5 +1,28 @@
 import datetime
-from typing import Optional
+from typing import Iterable, Optional
+
+
+class TimerLoop:
+    def __init__(self, it: Iterable):
+        self.it = iter(it)
+        self.n = 0
+
+    def __iter__(self):
+        self.start_time = datetime.datetime.now()
+        return self
+
+    def __next__(self):
+        try:
+            itval = self.it.__next__()
+            self.n += 1
+            return itval
+        except StopIteration:
+            self.end_time = datetime.datetime.now()
+            elapsed_time = self.end_time - self.start_time
+            print(
+                f"Took {elapsed_time.total_seconds():.2f}s for {self.n} iteration(s), {elapsed_time.total_seconds()/self.n:.2f}s per iteration."
+            )
+            raise
 
 
 class Timer:

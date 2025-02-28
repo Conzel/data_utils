@@ -29,7 +29,8 @@ def quant_to_grid(
     return grid_points, counts, dx
 
 
-def find_dx(x: np.ndarray) -> float:
+def find_dx(x: NumpyConvertible) -> float:
+    x = make_numpy(x)
     unique_vals = np.unique(x)
     if len(unique_vals) == 1:
         return 0.0

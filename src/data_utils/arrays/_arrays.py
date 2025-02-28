@@ -4,7 +4,7 @@ import numpy as np
 from typing import Union
 from torch.utils.data import Dataset, DataLoader
 
-NumpyConvertible = Union[torch.Tensor, np.ndarray]
+NumpyConvertible = Union[torch.Tensor, np.ndarray, list]
 
 
 def take_batches(ds: Dataset | DataLoader, n: int):
@@ -44,7 +44,7 @@ def subsample(x: torch.Tensor, stride: int) -> torch.Tensor:
 
 
 def shuffle(x: NumpyConvertible, dim: int) -> torch.Tensor:
-    idx = torch.randperm(x.shape[dim])
+    idx = torch.randperm(make_numpy(x).shape[dim])
 
     t_shuffled = x[idx]
     return t_shuffled
@@ -54,6 +54,8 @@ def make_numpy(x: NumpyConvertible) -> np.ndarray:
     """Converts x to a numpy array. If x is a torch tensor, it is detached and moved to the cpu."""
     if isinstance(x, torch.Tensor):
         x = x.detach().cpu().numpy()
+    if isinstance(x, list):
+        x = np.array(x)
     assert isinstance(x, np.ndarray), f"x must be convertible to numpy, got {type(x)}"
     return x
 

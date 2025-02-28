@@ -109,6 +109,9 @@ def show_hist(
         *args: Additional arguments passed to plt.hist().
         **kwargs: Additional arguments passed to plt.hist().
     """
+    if not isinstance(xs, list):
+        xs = [xs]
+        labels = [labels] if labels is not None else None
     plt.figure()
     for x in xs:
         if isinstance(x, torch.Tensor):
@@ -136,6 +139,7 @@ def show_quantized_bar(
     nlabels=5,
     dx=None,
     zero_array_width: float = 1,
+    **bar_style,
 ):
     grid_points, counts, dx = quant_to_grid(wq, dx=dx)
 
@@ -143,11 +147,11 @@ def show_quantized_bar(
         _, ax = plt.subplots()
 
     if dx == 0:
-        ax.bar(0, np.sum(counts), width=zero_array_width, align="center")
+        ax.bar(0, np.sum(counts), width=zero_array_width, align="center", **bar_style)
         ax.set_xticks([0])
     else:
         ax.bar(
-            grid_points, counts, width=dx * 0.9, align="center"
+            grid_points, counts, width=dx * 0.9, align="center", **bar_style
         )  # bar width based on dx
         step = max(1, len(grid_points) // nlabels)  # Show approximately 10 labels
         ax.set_xticks(grid_points[::step])

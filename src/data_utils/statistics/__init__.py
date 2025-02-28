@@ -21,7 +21,10 @@ from ._time_series import (
     autocorr,
 )
 
+from ._entropies import shannon
+
 __all__ = [
+    "shannon",
     "psnr",
     "mse",
     "rmse",

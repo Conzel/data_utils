@@ -10,7 +10,7 @@ from ._arrays import (
     flatten_coords,
     take_batches,
 )
-from ._quant import quant_to_grid, to_idx_space
+from ._quant import quant_to_grid, to_idx_space, find_dx
 
 __all__ = [
     "take_batches",
@@ -25,4 +25,5 @@ __all__ = [
     "subsample",
     "quant_to_grid",
     "to_idx_space",
+    "find_dx",
 ]
