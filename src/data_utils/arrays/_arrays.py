@@ -70,7 +70,7 @@ def get_bytes_of_net(net: torch.nn.Module):
     return sum(get_bytes_of_tensor(t) for t in net.parameters())
 
 
-def order_by_first(x: np.ndarray | list, y: np.ndarray | list):
+def order_by_first(x: np.ndarray | list, y: np.ndarray | list) -> tuple:
     """Orders x and y by the values of x."""
     if isinstance(x, list):
         x = np.array(x)
