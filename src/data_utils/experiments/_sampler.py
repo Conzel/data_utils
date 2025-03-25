@@ -1,36 +1,67 @@
-from typing import Literal
+from typing import Literal, Optional
 import numpy as np
 
 
 class AdaptiveSampler:
-    """Adaptive sampler for probing a functional with respect to a parameter.
+    """Adaptive sampler for probing a **monotonous** functional f: R -> R with respect to a parameter. The sampler can be used
+    as an iterator which produces new parameter recommendations.
+
+    Usage example:
+    s = AdaptiveSampler((1, 100), max_function_step=0.1, output_range=(-4, 4))
+    f_sampled = []
+    params = []
+
+    for p in s:
+        output = f(p)
+        f_sampled.append(output)
+        params.append(p)
+        s.record(output)
+
     If the sampler finishes before the maximum number of iterations (default: 100), it is guaranteed
-    that the function values are within the maximum step defined in the constructor.
+    that the specified output range is covered with a granularity of 0.1 (maximum dist between values).
+
+    input_range: Specify minimum and maximum value of the input
+    output_range: Specify a region of interest. If this is None, f(input_range[0]) and f(input_range[1]) are used to determine the range
+    initial_sampling: Specify how to determine the initial sampling points. Does a linear/logarithmic covering of the input range
+    initial_sampling_points: How many points the initial sampling contains
     """
 
     def __init__(
         self,
-        val_range: tuple[float, float],
+        input_range: tuple[float, float],
         max_function_step: float,
         max_iter=100,
+        output_range: Optional[tuple[float, float]] = None,
         initial_sampling: Literal["linear", "log"] = "log",
         initial_sampling_points=10,
     ):
-        a0, a1 = val_range
-        if initial_sampling == "log" and a0 <= 0:
+        self.output_range = output_range
+        self.input_range = input_range
+        self.max_function_step = max_function_step
+        self.max_iter = max_iter
+        self.initial_sampling: Literal["linear", "log"] = initial_sampling
+        self.initial_sampling_points = initial_sampling_points
+        self.refresh()
+
+    def refresh(
+        self,
+    ):
+
+        a0, a1 = self.input_range
+        if self.initial_sampling == "log" and a0 <= 0:
             raise ValueError("Logarithmic sampling requires positive range.")
 
-        if initial_sampling == "log":
+        if self.initial_sampling == "log":
             self.a_stack = np.logspace(
-                np.log10(a0), np.log10(a1), initial_sampling_points
+                np.log10(a0), np.log10(a1), self.initial_sampling_points
             ).tolist()
         else:
-            self.a_stack = np.linspace(a0, a1, initial_sampling_points).tolist()
+            self.a_stack = np.linspace(a0, a1, self.initial_sampling_points).tolist()
         self.vals = []
         self.a = []
-        self.max_function_step = max_function_step
+        self.max_function_step = self.max_function_step
         self.i = 0
-        self.max_iter = max_iter
+        self.max_iter = self.max_iter
 
     def manually_add(self, a: float):
         self.a_stack.append(a)
@@ -59,9 +90,29 @@ class AdaptiveSampler:
         # sorts both lists according to the first one
         self.a, self.vals = map(list, zip(*sorted(zip(self.a, self.vals))))
         valnp = np.array(self.vals)
+        anp = np.array(self.a)
+        if self.output_range is not None:
+            inside_range = np.logical_and(
+                valnp >= self.output_range[0], valnp <= self.output_range[1]
+            )
+            valnp = valnp[inside_range]
+            anp = anp[inside_range]
         fdeltas = np.abs(valnp[:-1] - valnp[1:])
-        adeltas = np.array(self.a[1:]) - np.array(self.a[:-1])
+        adeltas = anp[1:] - anp[:-1]
         assert np.all(adeltas >= 0)
         step_too_high = (fdeltas > self.max_function_step).astype(int)
-        new_a = step_too_high * adeltas / 2 + self.a[:-1]
+        new_a = step_too_high * adeltas / 2 + anp[:-1]
         self.a_stack = new_a[step_too_high.astype(bool)].tolist()
+
+    def __iter__(self):
+        """Return self as iterator."""
+        self.refresh()
+        return self
+
+    def __next__(self):
+        """Get the next parameter value."""
+        next_val = self.get_next()
+        if next_val is None:
+            raise StopIteration
+        self._current_value = next_val
+        return next_val
