@@ -95,6 +95,12 @@ class AdaptiveSampler:
             inside_range = np.logical_and(
                 valnp >= self.output_range[0], valnp <= self.output_range[1]
             )
+            first_over = np.argmax(inside_range)
+            if first_over > 0:
+                inside_range[first_over - 1] = True
+            last_over = len(inside_range) - np.argmax(inside_range[::-1]) - 1
+            if last_over < len(inside_range) - 1:
+                inside_range[last_over + 1] = True
             valnp = valnp[inside_range]
             anp = anp[inside_range]
         fdeltas = np.abs(valnp[:-1] - valnp[1:])
