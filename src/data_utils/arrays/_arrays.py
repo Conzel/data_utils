@@ -84,3 +84,22 @@ def round_grid(x: NumpyConvertible, grid_size: float) -> np.ndarray:
     """Round the values of `x` to the nearest multiple of `grid_size`."""
     x = make_numpy(x)
     return np.round(x / grid_size) * grid_size
+
+
+def strided_index_pairs(upper_bound: int, stride: int):
+    """
+    Iterator that yields (lower, upper) index pairs for strided indexing.
+
+    Args:
+        upper_bound (int): The maximum index value (exclusive)
+        stride (int): The size of each stride/group
+
+    Yields:
+        tuple: (lower_index, upper_index) pairs
+    """
+    if stride <= 0:
+        raise ValueError("Stride must be a positive integer")
+
+    for lower_idx in range(0, upper_bound, stride):
+        upper_idx = min(lower_idx + stride, upper_bound)
+        yield lower_idx, upper_idx

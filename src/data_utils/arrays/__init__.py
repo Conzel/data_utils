@@ -9,10 +9,12 @@ from ._arrays import (
     subsample,
     flatten_coords,
     take_batches,
+    strided_index_pairs,
 )
 from ._quant import quant_to_grid, to_idx_space, find_dx
 
 __all__ = [
+    "strided_index_pairs",
     "take_batches",
     "flatten_coords",
     "make_numpy",
